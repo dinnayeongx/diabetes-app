@@ -1,0 +1,13 @@
+{
+    "model_file": "diabetes_model.pkl",
+    "features": [
+        "Pregnancies",
+        "Glucose",
+        "BloodPressure",
+        "BMI",
+        "Age"
+    ],
+    "target": "Outcome",
+    "accuracy": 0.7662337662337663,
+    "model_type": "Pipeline(SimpleImputer + StandardScaler + RandomForestClassifier)"
+}
