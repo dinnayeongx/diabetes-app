@@ -9,18 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "model_diabetes_knn.pkl"
+MODEL_PATH = BASE_DIR / "model.pkl"
 
 FEATURES = [
-    "Glucose",
-    "BMI",
-    "BloodPressure",
-    "Age",
-    "Pregnancies"
+    'Glucose', 'BMI', 'Age', 'Pregnancies', 'DiabetesPedigreeFunction'
 ]
 
 app = FastAPI(
-    title="Diabetes Detection API",
+    title="Diabetes Risk Detection API",
     description="API prediksi risiko diabetes untuk frontend Flutter.",
     version="1.0.0",
 )
@@ -33,16 +29,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model = joblib.load(MODEL_PATH)
-print(model.feature_names_in_)
+bundle = joblib.load(MODEL_PATH)
+
+model = bundle["model"]
+FEATURES = bundle["fitur"]
+
+print("Fitur model:", FEATURES)
 
 class DiabetesInput(BaseModel):
     Pregnancies: float = Field(..., ge=0)
     Glucose: float = Field(..., ge=0)
-    BloodPressure: float = Field(..., ge=0)
+    # BloodPressure: float = Field(..., ge=0)
     BMI: float = Field(..., ge=0)
     Age: float = Field(..., ge=0)
-
+    # SkinThickness: float = Field(..., ge=0)
+    # Insulin: float = Field(..., ge=0)
+    DiabetesPedigreeFunction: float = Field(..., ge=0)
 
 class PredictionResponse(BaseModel):
     prediction: int
@@ -65,19 +67,17 @@ def health():
 def predict(data: DiabetesInput):
 
     try:
-        # FIX: pastikan urutan fitur selalu sama
-        row = [
-            data.Glucose,
-            data.BMI,
-            data.BloodPressure,
-            data.Age,
-            data.Pregnancies
-        ]
+        input_dict = data.model_dump()
+
+        row = {feature: input_dict.get(feature) for feature in FEATURES}
 
         df = pd.DataFrame([row], columns=FEATURES)
 
         prediction = int(model.predict(df)[0])
-        probability = float(model.predict_proba(df)[0][1])
+
+        probability = float(
+            model.predict_proba(df)[0][1]
+        )
 
         if probability >= 0.70:
             risk_level = "High"
@@ -86,7 +86,11 @@ def predict(data: DiabetesInput):
         else:
             risk_level = "Low"
 
-        result = "High Diabetes Risk" if prediction == 1 else "Low Diabetes Risk"
+        result = (
+            "High Diabetes Risk"
+            if prediction == 1
+            else "Low Diabetes Risk"
+        )
 
         return PredictionResponse(
             prediction=prediction,

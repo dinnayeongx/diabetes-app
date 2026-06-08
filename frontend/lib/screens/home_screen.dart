@@ -14,9 +14,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final pregnanciesController = TextEditingController();
   final glucoseController = TextEditingController();
-  final bloodPressureController = TextEditingController();
+  // final bloodPressureController = TextEditingController();
   final bmiController = TextEditingController();
   final ageController = TextEditingController();
+  // final skinThicknessController = TextEditingController();
+  // final insulinController = TextEditingController();
+  final diabetesPedigreeController = TextEditingController();
 
   String result = "";
   double probability = 0;
@@ -32,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return "http://10.0.2.2:8000";
     }
 
-    return "http://10.87.73.142:8000";
+    return "http://192.168.18.144:8000";
   }
 
   Widget buildInput({
@@ -68,15 +71,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> predict() async {
     final pregnancies = parseInput(pregnanciesController);
     final glucose = parseInput(glucoseController);
-    final bloodPressure = parseInput(bloodPressureController);
+    // final bloodPressure = parseInput(bloodPressureController);
     final bmi = parseInput(bmiController);
     final age = parseInput(ageController);
+    // final skinThickness = parseInput(skinThicknessController);
+    // final insulin = parseInput(insulinController);
+    final diabetesPedigreeFunction = parseInput(diabetesPedigreeController);
 
     if (pregnancies == null ||
         glucose == null ||
-        bloodPressure == null ||
+        // bloodPressure == null ||
         bmi == null ||
-        age == null) {
+        age == null ||
+        // skinThickness == null ||
+        // insulin == null ||
+        diabetesPedigreeFunction == null) {
       setState(() {
         result = "Please fill all fields with valid numbers";
         probability = 0;
@@ -97,9 +106,12 @@ class _HomeScreenState extends State<HomeScreen> {
         body: jsonEncode({
           "Pregnancies": pregnancies,
           "Glucose": glucose,
-          "BloodPressure": bloodPressure,
+          // "BloodPressure": bloodPressure,
           "BMI": bmi,
           "Age": age,
+          // "SkinThickness": skinThickness,
+          // "Insulin": insulin,
+          "DiabetesPedigreeFunction": diabetesPedigreeFunction,
         }),
       );
 
@@ -133,9 +145,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     pregnanciesController.dispose();
     glucoseController.dispose();
-    bloodPressureController.dispose();
+    // bloodPressureController.dispose();
     bmiController.dispose();
     ageController.dispose();
+    // skinThicknessController.dispose();
+    // insulinController.dispose();
+    diabetesPedigreeController.dispose();
     super.dispose();
   }
 
@@ -145,10 +160,10 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.purple,
         centerTitle: true,
         title: const Text(
-          "Diabetes Detection",
+          "Diabetes Risk Detection",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
@@ -178,11 +193,16 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.monitor_heart_outlined,
               controller: glucoseController,
             ),
-            buildInput(
-              label: "Blood Pressure",
-              icon: Icons.favorite_border,
-              controller: bloodPressureController,
-            ),
+            // buildInput(
+            //   label: "Blood Pressure",
+            //   icon: Icons.favorite_border,
+            //   controller: bloodPressureController,
+            // ),
+            // buildInput(
+            //   label: "Skin Thickness",
+            //   icon: Icons.opacity_outlined,
+            //   controller: skinThicknessController,
+            // ),
             buildInput(
               label: "BMI",
               icon: Icons.fitness_center_outlined,
@@ -193,6 +213,16 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.person_outline,
               controller: ageController,
             ),
+            // buildInput(
+            //   label: "Insulin",
+            //   icon: Icons.invert_colors_outlined,
+            //   controller: insulinController,
+            // ),
+            buildInput(
+              label: "Diabetes Pedigree Function",
+              icon: Icons.family_restroom_outlined,
+              controller: diabetesPedigreeController,
+            ),
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
@@ -200,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ElevatedButton(
                 onPressed: isLoading ? null : predict,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Colors.purple,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
@@ -246,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const Icon(
                       Icons.analytics_outlined,
                       size: 70,
-                      color: Colors.blue,
+                      color: Colors.purple,
                     ),
                     const SizedBox(height: 20),
                     Text(

@@ -15,9 +15,8 @@ Integrasi API Flutter ↔ FastAPI
 diabetes_flutter_fastapi_project/
 ├── backend/
 │   ├── main.py
-│   ├── train_model.py
+│   ├── model.pkl
 │   ├── requirements.txt
-│   ├── sample_request.json
 │   └── README.md
 │
 └── frontend_flutter/
@@ -35,7 +34,7 @@ User isi data di Flutter
         ↓
 Flutter kirim POST request ke FastAPI /predict
         ↓
-FastAPI memuat model diabetes_model.pkl
+FastAPI memuat model model.pkl
         ↓
 Model ML melakukan prediksi
         ↓
@@ -48,15 +47,6 @@ Flutter menampilkan result dan probability
 
 ```bash
 cd backend
-pip install -r requirements.txt
-```
-
-Letakkan dataset `diabetes.csv` di folder `backend`.
-
-Kemudian training model:
-
-```bash
-python train_model.py
 ```
 
 Jalankan API:
@@ -74,7 +64,7 @@ http://127.0.0.1:8000/docs
 ## 2. Menjalankan Flutter
 
 ```bash
-cd frontend_flutter
+cd frontend
 flutter pub get
 flutter run
 ```
@@ -106,10 +96,10 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```json
 {
   "Pregnancies": 2,
-  "Glucose": 120,
-  "BloodPressure": 70,
-  "BMI": 25.5,
-  "Age": 30
+  "Glucose": 130,
+  "BMI": 32,
+  "Age": 38,
+  "DiabetesPedigreeFunction": 0.87
 }
 ```
 
@@ -119,11 +109,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 {
   "prediction": 0,
   "result": "Low Diabetes Risk",
-  "probability": 0.23,
-  "risk_level": "Low"
+  "probability": 41.7,
+  "risk_level": "Medium"
 }
 ```
-
-## Catatan
-
-Frontend tetap menggunakan 5 input sesuai file Dart awal. Backend tetap dilatih dengan 8 fitur dataset Pima. Tiga fitur yang tidak dikirim Flutter, yaitu `SkinThickness`, `Insulin`, dan `DiabetesPedigreeFunction`, akan dianggap kosong dan ditangani oleh `SimpleImputer` pada pipeline model.
